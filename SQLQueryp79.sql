@@ -279,10 +279,12 @@ USE db_Library
 GO
 CREATE PROC NoChecked
 AS
-SELECT BorrowerName 
-FROM Borrower
-INNER JOIN Book_Loans On Book_Loans.CardNo = Borrower.CardNo
-WHERE Borrower.CardNO NOT IN (Book_Loans.CardNo);
+SELECT bo.BorrowerName
+FROM Borrower bo
+WHERE bo.CardNo NOT IN
+	(SELECT CardNo
+	FROM Book_Loans)
+OR bo.CardNo IS NULL;
 GO
 
 USE db_Library
@@ -294,8 +296,7 @@ FROM Borrower
 INNER JOIN Book_Loans ON Borrower.CardNo = Book_Loans.CardNo
 INNER JOIN Books ON Books.BookID = Book_Loans.BookID
 INNER JOIN Library_Branch ON Library_Branch.BranchID = Book_Loans.BranchID
-WHERE BranchName = 'Sharpstown' AND DateDue >=DATEADD(day, DATEDIFF(day,0,GETDATE()),0) 
-AND DateDue < DATEADD(day, DATEDIFF(day,0,GETDATE())+1,0);
+WHERE BranchName = 'Sharpstown' AND DateDue = FORMAT(GETDATE(), 'd', 'zu');
 GO
 
 USE db_Library
